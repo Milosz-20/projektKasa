@@ -18,7 +18,7 @@ public class Product {
     Double price;
 
     @Column(name = "barcode")
-    int barcode;
+    String barcode;
 
     public Long getId() {
         return id;
@@ -44,11 +44,11 @@ public class Product {
         this.price = price;
     }
 
-    public int getBarcode() {
+    public String getBarcode() {
         return barcode;
     }
 
-    public void setBarcode(int barcode) {
+    public void setBarcode(String barcode) {
         this.barcode = barcode;
     }
 }

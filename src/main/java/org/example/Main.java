@@ -16,6 +16,7 @@ public class Main {
         List<Product> result = session.createQuery("from Product", Product.class).list();
         result.forEach(product -> {
             System.out.println(product.getName());
+            System.out.println(product.getPrice());
         });
 
         transaction.commit();
