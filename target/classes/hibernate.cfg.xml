@@ -6,14 +6,13 @@
 <hibernate-configuration>
     <session-factory>
         <!-- Database connection settings -->
-
         <property name="connection.driver_class">org.postgresql.Driver</property>
         <property name="connection.url">jdbc:postgresql://dpg-cu58v3dsvqrc73dt7cfg-a.frankfurt-postgres.render.com:5432/shop_0end</property>
         <property name="connection.username">skibior</property>
         <property name="connection.password">1xQMgfmqf0Ul5mgNjpiCdUyByT4B0Lwb</property>
 
         <!-- postgreSQL dialect -->
-        <property name="dialect">org.hibernate.dialect.PostgreSQL82Dialect</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
 
 
         <property name="show_sql">true</property>
