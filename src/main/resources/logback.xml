@@ -6,6 +6,9 @@
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
     </appender>
 
     <!-- Appender dla loggera "display", idzie tylko do konsoli -->
@@ -17,12 +20,12 @@
 
     <!-- Logger "display" - poziom INFO lub wyższy idzie do konsoli -->
     <logger name="display" level="info" additivity="false">
-        <appender-ref ref="DISPLAY" />
+        <appender-ref ref="DISPLAY"/>
     </logger>
 
     <!-- Root logger - wszystko idzie do pliku -->
     <root level="debug">
-        <appender-ref ref="FILE" />
+        <appender-ref ref="FILE"/>
     </root>
 
 </configuration>
