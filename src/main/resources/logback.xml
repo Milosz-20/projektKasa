@@ -1,0 +1,28 @@
+<configuration>
+
+    <!-- Appender dla zwykłych logów, idzie do pliku -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>application.log</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Appender dla loggera "display", idzie tylko do konsoli -->
+    <appender name="DISPLAY" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Logger "display" - poziom INFO lub wyższy idzie do konsoli -->
+    <logger name="display" level="info" additivity="false">
+        <appender-ref ref="DISPLAY" />
+    </logger>
+
+    <!-- Root logger - wszystko idzie do pliku -->
+    <root level="debug">
+        <appender-ref ref="FILE" />
+    </root>
+
+</configuration>
