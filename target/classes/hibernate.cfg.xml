@@ -19,9 +19,14 @@
         <property name="show_sql">true</property>
         <property name="format_sql">true</property>
         <property name="hbm2ddl.auto">update</property>
+        <property name="hibernate.show_sql">false</property>
+        <property name="hibernate.format_sql">false</property>
+
 
         <!-- Names the annotated entity class -->
         <mapping class="org.example.Product"/>
+
+
 
     </session-factory>
 </hibernate-configuration>
