@@ -1,9 +1,9 @@
 package org.example;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.util.Objects;
 
 @Entity
@@ -45,6 +45,9 @@ public class Product {
     }
 
     public void setPrice(Double price) {
+        if (price == null || price <= 0) {
+            throw new IllegalArgumentException("Price must be a positive value.");
+        }
         this.price = price;
     }
 
