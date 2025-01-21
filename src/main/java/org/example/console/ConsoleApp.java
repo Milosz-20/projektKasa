@@ -93,19 +93,49 @@ public class ConsoleApp {
     }
 
     private void handleProductScan(Session session, Product product) {
+        Product currentProduct = session.get(Product.class, product.getId());
+        if (currentProduct == null) {
+            displayLogger.info("Product with ID: " + product.getId() + " does not exist.");
+            return;
+        }
+
         logger.info("Product scanned: {}", product.getName());
-        if (product.getAvailable_quantity() > 0) {
-            updateProductQuantity(session, product);
-            scannedProducts.put(product, scannedProducts.getOrDefault(product, 0) + 1);
+        if (canAddProduct(session, currentProduct)) {
+            scannedProducts.put(currentProduct, scannedProducts.getOrDefault(currentProduct, 0) + 1);
+            displayLogger.info("Product scanned: " + currentProduct.getName());
         } else {
-            displayLogger.info("Product: {} is currently out of stock. Cannot add to order.", product.getName());
+            displayLogger.info("Product: {} is currently out of stock (or insufficient quantity). Cannot add to order.", currentProduct.getName());
         }
     }
 
-    private void updateProductQuantity(Session session, Product product) {
-        product.setAvailable_quantity(product.getAvailable_quantity() - 1);
-        session.update(product);
-        displayLogger.info("Product: {}, Remaining quantity: {}", product.getName(), product.getAvailable_quantity());
+    private boolean canAddProduct(Session session, Product product) {
+        int scannedQuantity = scannedProducts.getOrDefault(product, 0);
+
+        for (Map.Entry<Product, Integer> entry : scannedProducts.entrySet()) {
+            Product p = session.get(Product.class, entry.getKey().getId());
+            if (p.getId().equals(product.getId())) {
+                if (p.getAvailable_quantity() < scannedQuantity + 1) {
+                    return false;
+                }
+            } else {
+                if (p.getAvailable_quantity() < entry.getValue()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void updateProductQuantity(Session session) {
+        scannedProducts.forEach((product, quantity) -> {
+            if (product.getAvailable_quantity() >= quantity) {
+                product.setAvailable_quantity(product.getAvailable_quantity() - quantity);
+                session.merge(product);
+                logger.info("Updated product: {} to quantity: {}", product.getName(), product.getAvailable_quantity());
+            } else {
+                displayLogger.info("Product: {} is out of stock. Cannot add to order.", product.getName());
+            }
+        });
     }
 
     public boolean isDataBarcode(String barcodeInput) {
@@ -116,31 +146,69 @@ public class ConsoleApp {
     }
 
     public void printScannedProducts() {
-        final int RECEIPT_WIDTH = 60;
-        displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
-        displayLogger.info(centerText("----- Scanned Products -----", RECEIPT_WIDTH));
-        displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
+        Session session = null;
+        Transaction transaction = null;
 
-        AtomicReference<Double> totalAmount = new AtomicReference<>(0.0);
+        try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
 
-        scannedProducts.forEach((product, quantity) -> {
-            double totalPrice = product.getPrice() * quantity;
-            totalAmount.updateAndGet(v -> v + totalPrice);
+            final int RECEIPT_WIDTH = 60;
+            displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
+            displayLogger.info(centerText("----- Scanned Products -----", RECEIPT_WIDTH));
+            displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
 
-            String productName = product.getName();
-            String price = String.format("%.2f zł", product.getPrice());
-            String quantityStr = "x" + quantity;
-            String total = String.format("%.2f zł", totalPrice);
+            AtomicReference<Double> totalAmount = new AtomicReference<>(0.0);
+            Map<Product, Integer> productsToUpdate = new HashMap<>();
 
-            String line = formatReceiptLine(productName, "", rightAlignText(price + " " + quantityStr + " " + total), RECEIPT_WIDTH);
-            displayLogger.info(line);
-        });
+            for (Map.Entry<Product, Integer> entry : scannedProducts.entrySet()) {
+                Product product = entry.getKey();
+                Integer quantity = entry.getValue();
 
-        displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
+                Product currentProduct = session.get(Product.class, product.getId());
+                if (currentProduct == null) {
+                    displayLogger.info("Product with ID: {} does not exist.", product.getId());
+                    continue;
+                }
 
-        String totalLine = formatReceiptLine("TOTAL:", "", rightAlignText(String.format("%.2f zł", totalAmount.get())), RECEIPT_WIDTH);
-        displayLogger.info(totalLine);
-        displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
+                if (currentProduct.getAvailable_quantity() >= quantity) {
+                    double totalPrice = currentProduct.getPrice() * quantity;
+                    totalAmount.updateAndGet(v -> v + totalPrice);
+
+                    String productName = currentProduct.getName();
+                    String price = String.format("%.2f zł", currentProduct.getPrice());
+                    String quantityStr = "x" + quantity;
+                    String total = String.format("%.2f zł", totalPrice);
+
+                    String line = formatReceiptLine(productName, "", rightAlignText(price + " " + quantityStr + " " + total), RECEIPT_WIDTH);
+                    displayLogger.info(line);
+
+                    productsToUpdate.put(currentProduct, quantity);
+                } else {
+                    displayLogger.info("Insufficient quantity for product: {}. Available: {}, Requested: {}",
+                            currentProduct.getName(), currentProduct.getAvailable_quantity(), quantity);
+                }
+            }
+
+            displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
+
+            String totalLine = formatReceiptLine("TOTAL:", "", rightAlignText(String.format("%.2f zł", totalAmount.get())), RECEIPT_WIDTH);
+            displayLogger.info(totalLine);
+            displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
+
+            updateProductQuantity(session);
+            transaction.commit();
+            scannedProducts.clear();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            logger.error("Error during printing or updating products: {}", e.getMessage(), e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 
     private String centerText(String text, int width) {
