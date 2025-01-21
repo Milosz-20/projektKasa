@@ -176,9 +176,9 @@ public class ConsoleApp {
                     totalAmount.updateAndGet(v -> v + totalPrice);
 
                     String productName = currentProduct.getName();
-                    String price = String.format("%.2f zł", currentProduct.getPrice());
+                    String price = String.format("%.2f zl", currentProduct.getPrice());
                     String quantityStr = "x" + quantity;
-                    String total = String.format("%.2f zł", totalPrice);
+                    String total = String.format("%.2f zl", totalPrice);
 
                     String line = formatReceiptLine(productName, "", rightAlignText(price + " " + quantityStr + " " + total), RECEIPT_WIDTH);
                     displayLogger.info(line);
@@ -192,7 +192,7 @@ public class ConsoleApp {
 
             displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
 
-            String totalLine = formatReceiptLine("TOTAL:", "", rightAlignText(String.format("%.2f zł", totalAmount.get())), RECEIPT_WIDTH);
+            String totalLine = formatReceiptLine("TOTAL:", "", rightAlignText(String.format("%.2f zl", totalAmount.get())), RECEIPT_WIDTH);
             displayLogger.info(totalLine);
             displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
 
