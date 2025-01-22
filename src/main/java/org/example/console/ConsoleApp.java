@@ -19,7 +19,7 @@ public class ConsoleApp {
     private static final Logger displayLogger = LoggerFactory.getLogger("display");
     private final Scanner scanner;
     SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-    private static final String PRINT_COMMAND = "print";
+    private static final String PAY_COMMAND = "pay";
     private static final String EXIT_COMMAND = "exit";
     private final Map<Product, Integer> scannedProducts = new HashMap<>();
 
@@ -29,20 +29,43 @@ public class ConsoleApp {
 
     public void run() {
         displayLogger.info("Welcome to the Product Scanner App!");
-        displayLogger.info("---------------------------------");
+        displayNiceLine();
         displayLogger.info("Instructions:");
         displayLogger.info("* Scan barcodes to add products to your order.");
-        displayLogger.info("* Type '"+ PRINT_COMMAND +"' to view the current order.");
+        displayLogger.info("* Type '"+ PAY_COMMAND +"' to view the current order.");
         displayLogger.info("* Type '"+ EXIT_COMMAND +"' to close the application.");
-        displayLogger.info("---------------------------------");
+        displayNiceLine();
         logger.info("Application started.");
 
         while (true) {
             String barcodeInput = scanner.nextLine();
+
             if (barcodeInput.equals(EXIT_COMMAND)) {
                 break;
-            } else if (barcodeInput.equals(PRINT_COMMAND)) {
+            } else if (barcodeInput.equals(PAY_COMMAND)) {
                 printScannedProducts();
+                displayLogger.info("Select payment method");
+                displayNiceLine();
+                displayLogger.info("  Type '1' to pay via card");
+                displayLogger.info("  Type '2' to pay by scanning gift card");
+                displayNiceLine();
+                String paymentMethod = scanner.nextLine();
+
+                switch (paymentMethod) {
+                    case "1":
+                        displayLogger.info("Card");
+
+
+                        break;
+                    case "2":
+                        displayLogger.info("Gift card");
+
+                        break;
+                    default:
+                        displayLogger.info("Unknown payment method");
+                        break;
+                }
+
             } else {
                 handleInput(barcodeInput);
             }
@@ -50,6 +73,10 @@ public class ConsoleApp {
 
         logger.info("Exiting application.");
         sessionFactory.close();
+    }
+
+    public void displayNiceLine() {
+        displayLogger.info("---------------------------------");
     }
 
     public void handleInput(String barcodeInput) {
