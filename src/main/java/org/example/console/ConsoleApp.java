@@ -1,5 +1,8 @@
 package org.example.console;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -53,8 +56,41 @@ public class ConsoleApp {
 
                 switch (paymentMethod) {
                     case "1":
-                        displayLogger.info("Card");
+                        displayLogger.info("enter Card number");
+                        String cardNumber = scanner.nextLine();
+                        displayLogger.info("enter Card expiry month");
+                        String expiryMonth = scanner.nextLine();
+                        displayLogger.info("enter Card expiry year");
+                        String expiryYear = scanner.nextLine();
 
+                        try {
+                            // Przyjmujemy, że rok jest podawany w formacie RR (np. 20), a nie YYYY (np. 2020)
+                            // Najpierw przekształcamy rok do formatu YYYY, zakładając, że '20' oznacza '2020'
+                            int year = Integer.parseInt(expiryYear);
+                            if (year < 100) {
+                                year = 2000 + year;
+                            }
+
+                            // Format MM/YYYY - potrzebny do parsowania stringów
+                            String formattedMonth = String.format("%02d", Integer.parseInt(expiryMonth)); // Formatujemy miesiąc z zerem wiodącym
+                            String expiryDateString = String.format("%s/%d", formattedMonth, year); // np. "03/2020"
+
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yyyy");
+
+                            LocalDate expiryDate = LocalDate.parse(expiryDateString, formatter);
+
+                            // W tym miejscu masz LocalDate obiekt, który reprezentuje datę 1 dnia danego miesiąca w roku
+                            // Możesz go teraz zapisać do bazy danych, używając np. prepared statement:
+                            // preparedStatement.setDate(1, java.sql.Date.valueOf(expiryDate));
+
+                            displayLogger.info("Parsed Date: " + expiryDate); // Możesz wyświetlić datę w odpowiednim formacie
+                            displayLogger.info("Saving Date: " + java.sql.Date.valueOf(expiryDate.withDayOfMonth(1))); // Data dla bazy danych
+                        } catch (NumberFormatException e) {
+                            displayLogger.info("Invalid year format: " + expiryYear);
+                        }
+                        catch (DateTimeParseException e) {
+                            displayLogger.info("Invalid date format. Please enter MM/YY: " + expiryMonth + "/" + expiryYear);
+                        }
 
                         break;
                     case "2":
