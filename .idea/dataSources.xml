@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="shop_0end@dpg-cu58v3dsvqrc73dt7cfg-a.frankfurt-postgres.render.com" uuid="1cb7d5e0-29ab-4d37-9bfe-272b44573834">
+    <data-source source="LOCAL" name="shop_jkl0" uuid="1cb7d5e0-29ab-4d37-9bfe-272b44573834">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://dpg-cu58v3dsvqrc73dt7cfg-a.frankfurt-postgres.render.com:5432/shop_0end</jdbc-url>
+      <jdbc-url>jdbc:postgresql://dpg-cuqriojv2p9s73fijvd0-a.frankfurt-postgres.render.com:5432/shop_jkl0</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
+        <property name="com.intellij.clouds.kubernetes.db.resource.type" value="Deployment" />
         <property name="com.intellij.clouds.kubernetes.db.container.port" />
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
@@ -21,6 +22,7 @@
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
+        <property name="com.intellij.clouds.kubernetes.db.resource.type" value="Deployment" />
         <property name="com.intellij.clouds.kubernetes.db.container.port" />
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
