@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="shop@localhost" uuid="604bfc37-7bca-44e7-954a-5212811045d5">
-      <driver-ref>mariadb</driver-ref>
+    <data-source source="LOCAL" name="shop@ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech" uuid="06abb058-a679-4ffe-a7b1-d4972d4805bb">
+      <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
-      <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mariadb://localhost:3306/shop</jdbc-url>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />

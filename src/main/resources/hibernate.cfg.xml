@@ -4,17 +4,17 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
-        <!-- Konfiguracja połączenia z bazą danych -->
-        <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-        <property name="connection.url">jdbc:mysql://localhost:3306/shop?createDatabaseIfNotExist=true</property>
-        <property name="connection.username">root</property>
-        <!-- Usuń lub zakomentuj, jeśli nie ma hasła: <property name="connection.password">password</property> -->
-        <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+        <!-- Konfiguracja połączenia z bazą PostgreSQL na Neon.tech -->
+        <property name="connection.driver_class">org.postgresql.Driver</property>
+        <property name="connection.url">jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require</property>
+        <property name="connection.username">shop_owner</property>
+        <property name="connection.password">npg_GYBiZHlr43pq</property>
+        <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
 
         <!-- Opcje Hibernate -->
         <property name="show_sql">false</property>  <!-- Pokazuje zapytania SQL w konsoli -->
         <property name="format_sql">true</property> <!-- Formatuje zapytania SQL w konsoli -->
-        <property name="hbm2ddl.auto">update</property>  <!-- Automatycznie aktualizuje schemat bazy danych (używaj ostrożnie na produkcji!) -->
+        <property name="hbm2ddl.auto">update</property>  <!-- Automatycznie aktualizuje schemat bazy danych -->
 
         <!-- Mapowanie encji -->
         <mapping class="org.example.Product"/>  <!-- Zmień na pełną nazwę klasy Product -->

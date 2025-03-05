@@ -49,7 +49,7 @@ public class ConsoleApp {
                 printScannedProducts();
                 displayLogger.info("Select payment method");
                 displayNiceLine();
-                displayLogger.info("  Type '1' to pay via card");
+                displayLogger.info("  Type '1' to pay by card");
                 displayLogger.info("  Type '2' to pay by scanning gift card");
                 displayNiceLine();
                 String paymentMethod = scanner.nextLine();
@@ -283,7 +283,6 @@ public class ConsoleApp {
         int availableWidth = width - 2;
         String leftPart = left;
         String middlePart = middle;
-        String rightPart = right;
 
         int maxMiddlePartWidth = 10;
         int maxLeftPartWidth = availableWidth - maxMiddlePartWidth - right.length();
