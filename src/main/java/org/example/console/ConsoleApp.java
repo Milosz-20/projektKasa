@@ -85,13 +85,15 @@ public class ConsoleApp {
                                 throw new IllegalArgumentException("Nieprawidłowy miesiąc. Proszę wprowadzić wartość od 1 do 12.");
                             }
 
-                            YearMonth yearMonth = YearMonth.of(year, month);
+
+
+                            displayLogger.info("Płatność przetwarzana dla kwoty: {} zł", String.format("%.2f", totalAmount));
                             processCardPayment(cardNumber, month, year, totalAmount);
 
-                            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("MM/yyyy");
-                            String formattedDate = yearMonth.format(outputFormatter);
-                            displayLogger.info("Data ważności karty: {}", formattedDate);
-                            displayLogger.info("Płatność przetwarzana dla kwoty: {} zł", String.format("%.2f", totalAmount));
+
+
+
+
 
                         } catch (NumberFormatException e) {
                             displayLogger.info("Nieprawidłowe dane: Wprowadź liczby dla miesiąca i roku.");
@@ -163,7 +165,6 @@ public class ConsoleApp {
             int responseCode = connection.getResponseCode();
             displayLogger.info("Wysłano dane płatności do serwera, kod odpowiedzi: {}", responseCode);
 
-            // Odczytuj odpowiedź tylko jeśli status to sukces (2xx)
             if (responseCode >= 200 && responseCode < 300) {
                 try (BufferedReader br = new BufferedReader(
                         new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
@@ -172,7 +173,18 @@ public class ConsoleApp {
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
-                    displayLogger.info("Odpowiedź serwera: {}", response.toString());
+                    // Parsowanie odpowiedzi JSON i wyświetlanie tylko pola "message"
+                    try {
+                        Map responseMap = mapper.readValue(response.toString(), Map.class);
+                        if (responseMap.containsKey("message")) {
+                            displayLogger.info("Odpowiedź serwera: {}", responseMap.get("message"));
+                        } else {
+                            displayLogger.info("Odpowiedź serwera: {}", response);
+                        }
+                    } catch (Exception e) {
+                        displayLogger.info("Odpowiedź serwera: {}", response);
+                        logger.error("Błąd parsowania odpowiedzi JSON: {}", e.getMessage());
+                    }
                 }
             }
 
