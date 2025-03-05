@@ -1,5 +1,11 @@
 package org.example.console;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -7,6 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.Product;
 import org.hibernate
         .HibernateException;
@@ -48,6 +55,7 @@ public class ConsoleApp {
             if (barcodeInput.equals(EXIT_COMMAND)) {
                 break;
             } else if (barcodeInput.equals(PAY_COMMAND)) {
+                double totalAmount = calculateTotalAmount();
                 printScannedProducts();
                 displayLogger.info("Select payment method");
                 displayNiceLine();
@@ -62,36 +70,33 @@ public class ConsoleApp {
                         String cardNumber = scanner.nextLine();
                         displayLogger.info("Enter Card expiry month");
                         String expiryMonth = scanner.nextLine();
-                        displayLogger.info("Enter Card expiry year (YY)");  // Jasno określ format roku
+                        displayLogger.info("Enter Card expiry year (YY)");
                         String expiryYear = scanner.nextLine();
 
                         try {
                             int year = Integer.parseInt(expiryYear);
                             if (year < 0 || year > 99) {
-                                throw new IllegalArgumentException("Invalid year format. Please enter a two-digit year (YY).");
+                                throw new IllegalArgumentException("Nieprawidłowy format roku. Proszę wprowadzić dwucyfrowy rok (YY).");
                             }
                             year = 2000 + year;
 
                             int month = Integer.parseInt(expiryMonth);
                             if(month < 1 || month > 12){
-                                throw new IllegalArgumentException("Invalid month. Please enter a value between 1 and 12.");
+                                throw new IllegalArgumentException("Nieprawidłowy miesiąc. Proszę wprowadzić wartość od 1 do 12.");
                             }
 
                             YearMonth yearMonth = YearMonth.of(year, month);
-
-                            LocalDate expiryDate = yearMonth.atDay(1);
-
-                            displayLogger.info("Parsed Date: {}", expiryDate);
-                            displayLogger.info("Saving Date: {}", java.sql.Date.valueOf(expiryDate));
+                            processCardPayment(cardNumber, month, year, totalAmount);
 
                             DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("MM/yyyy");
                             String formattedDate = yearMonth.format(outputFormatter);
-                            displayLogger.info("Formatted Date (MM/yyyy): {}", formattedDate);
+                            displayLogger.info("Data ważności karty: {}", formattedDate);
+                            displayLogger.info("Płatność przetwarzana dla kwoty: {} zł", String.format("%.2f", totalAmount));
 
                         } catch (NumberFormatException e) {
-                            displayLogger.info("Invalid input: Please enter numbers for month and year.");
+                            displayLogger.info("Nieprawidłowe dane: Wprowadź liczby dla miesiąca i roku.");
                         } catch (DateTimeParseException e) {
-                            displayLogger.info("Invalid date format: {}", e.getMessage());
+                            displayLogger.info("Nieprawidłowy format daty: {}", e.getMessage());
                         } catch (IllegalArgumentException e) {
                             displayLogger.info(e.getMessage());
                         }
@@ -113,6 +118,68 @@ public class ConsoleApp {
 
         logger.info("Exiting application.");
         sessionFactory.close();
+    }
+
+    private double calculateTotalAmount() {
+        double total = 0.0;
+        Session session = sessionFactory.openSession();
+
+        try {
+            for (Map.Entry<Product, Integer> entry : scannedProducts.entrySet()) {
+                Product product = session.get(Product.class, entry.getKey().getId());
+                if (product != null) {
+                    total += product.getPrice() * entry.getValue();
+                }
+            }
+        } finally {
+            session.close();
+        }
+
+        return total;
+    }
+
+    private void processCardPayment(String cardNumber, int month, int year, double amount) {
+        try {
+            URL url = new URL("http://localhost:8080/api/platnosc");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            Map<String, Object> paymentData = new HashMap<>();
+            paymentData.put("cardNumber", cardNumber);
+            paymentData.put("expiryMonth", month);
+            paymentData.put("expiryYear", year);
+            paymentData.put("amount", amount);
+
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonData = mapper.writeValueAsString(paymentData);
+
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = connection.getResponseCode();
+            displayLogger.info("Wysłano dane płatności do serwera, kod odpowiedzi: {}", responseCode);
+
+            // Odczytuj odpowiedź tylko jeśli status to sukces (2xx)
+            if (responseCode >= 200 && responseCode < 300) {
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    displayLogger.info("Odpowiedź serwera: {}", response.toString());
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("Błąd podczas wysyłania danych płatności: {}", e.getMessage(), e);
+            displayLogger.info("Wystąpił błąd podczas przetwarzania płatności. Spróbuj ponownie.");
+        }
     }
 
     public void displayNiceLine() {
