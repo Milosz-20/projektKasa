@@ -40,6 +40,7 @@ public class ConsoleApp {
     }
 
     public void run() {
+        clearConsole();
         displayLogger.info("Welcome to the Product Scanner App!");
         displayNiceLine();
         displayLogger.info("Instructions:");
@@ -65,12 +66,16 @@ public class ConsoleApp {
 
                 switch (paymentMethod) {
                     case "1":
+                        clearConsoleLines(8);
                         displayLogger.info("Enter Card number");
                         String cardNumber = scanner.nextLine();
+                        clearConsoleLines(2);
                         displayLogger.info("Enter Card expiry month");
                         String expiryMonth = scanner.nextLine();
+                        clearConsoleLines(2);
                         displayLogger.info("Enter Card expiry year (YY)");
                         String expiryYear = scanner.nextLine();
+                        clearConsoleLines(2);
 
                         try {
                             int year = Integer.parseInt(expiryYear);
@@ -78,22 +83,12 @@ public class ConsoleApp {
                                 throw new IllegalArgumentException("Nieprawidłowy format roku. Proszę wprowadzić dwucyfrowy rok (YY).");
                             }
                             year = 2000 + year;
-
                             int month = Integer.parseInt(expiryMonth);
                             if(month < 1 || month > 12){
                                 throw new IllegalArgumentException("Nieprawidłowy miesiąc. Proszę wprowadzić wartość od 1 do 12.");
                             }
-
-
-
                             displayLogger.info("Płatność przetwarzana dla kwoty: {} zł", String.format("%.2f", totalAmount));
                             processCardPayment(cardNumber, month, year, totalAmount);
-
-
-
-
-
-
                         } catch (NumberFormatException e) {
                             displayLogger.info("Nieprawidłowe dane: Wprowadź liczby dla miesiąca i roku.");
                         } catch (DateTimeParseException e) {
@@ -274,6 +269,29 @@ public class ConsoleApp {
         } catch (Exception e) {
             logger.error("Error clearing console: {}", e.getMessage(), e);
             for (int i = 0; i < 50; i++) {
+                System.out.println();
+            }
+        }
+    }
+
+    private void clearConsoleLines(int lines) {
+        try {
+            final String os = System.getProperty("os.name");
+            if (os.contains("Windows")) {
+                for (int i = 0; i < lines; i++) {
+                    System.out.print("\033[1A"); // Move cursor up one line
+                    System.out.print("\033[2K"); // Clear the line
+                }
+            } else {
+                for (int i = 0; i < lines; i++) {
+                    System.out.print("\033[1A"); // Move cursor up one line
+                    System.out.print("\033[2K"); // Clear the line
+                }
+            }
+            System.out.flush();
+        } catch (Exception e) {
+            logger.error("Error clearing console lines: {}", e.getMessage(), e);
+            for (int i = 0; i < lines; i++) {
                 System.out.println();
             }
         }
