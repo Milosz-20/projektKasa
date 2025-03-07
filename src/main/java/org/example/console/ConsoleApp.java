@@ -56,7 +56,6 @@ public class ConsoleApp {
                 break;
             } else if (barcodeInput.equals(PAY_COMMAND)) {
                 double totalAmount = calculateTotalAmount();
-                printScannedProducts();
                 displayLogger.info("Select payment method");
                 displayNiceLine();
                 displayLogger.info("  Type '1' to pay by card");
@@ -166,6 +165,12 @@ public class ConsoleApp {
             displayLogger.info("Wysłano dane płatności do serwera, kod odpowiedzi: {}", responseCode);
 
             if (responseCode >= 200 && responseCode < 300) {
+                try (Session updateSession = sessionFactory.openSession()) {
+                    Transaction updateTransaction = updateSession.beginTransaction();
+                    updateProductQuantity(updateSession);
+                    updateTransaction.commit();
+                    scannedProducts.clear();
+                }
                 try (BufferedReader br = new BufferedReader(
                         new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
                     StringBuilder response = new StringBuilder();
@@ -239,6 +244,7 @@ public class ConsoleApp {
     }
 
     private void handleProductScan(Session session, Product product) {
+        clearConsole();
         Product currentProduct = session.get(Product.class, product.getId());
         if (currentProduct == null) {
             displayLogger.info("Product with ID: " + product.getId() + " does not exist.");
@@ -248,9 +254,28 @@ public class ConsoleApp {
         logger.info("Product scanned: {}", product.getName());
         if (canAddProduct(session, currentProduct)) {
             scannedProducts.put(currentProduct, scannedProducts.getOrDefault(currentProduct, 0) + 1);
-            displayLogger.info("Product scanned: " + currentProduct.getName());
+            printScannedProducts();
+            displayLogger.info("Type 'pay' to complete the order.");
         } else {
             displayLogger.info("Product: {} is currently out of stock (or insufficient quantity). Cannot add to order.", currentProduct.getName());
+        }
+    }
+
+    private void clearConsole() {
+        try {
+            final String os = System.getProperty("os.name");
+            if (os.contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "chcp", "65001").inheritIO().start().waitFor();
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            logger.error("Error clearing console: {}", e.getMessage(), e);
+            for (int i = 0; i < 50; i++) {
+                System.out.println();
+            }
         }
     }
 
@@ -305,7 +330,6 @@ public class ConsoleApp {
             displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
 
             AtomicReference<Double> totalAmount = new AtomicReference<>(0.0);
-            Map<Product, Integer> productsToUpdate = new HashMap<>();
 
             for (Map.Entry<Product, Integer> entry : scannedProducts.entrySet()) {
                 Product product = entry.getKey();
@@ -328,8 +352,6 @@ public class ConsoleApp {
 
                     String line = formatReceiptLine(productName, "", rightAlignText(price + " " + quantityStr + " " + total), RECEIPT_WIDTH);
                     displayLogger.info(line);
-
-                    productsToUpdate.put(currentProduct, quantity);
                 } else {
                     displayLogger.info("Insufficient quantity for product: {}. Available: {}, Requested: {}",
                             currentProduct.getName(), currentProduct.getAvailable_quantity(), quantity);
@@ -342,14 +364,12 @@ public class ConsoleApp {
             displayLogger.info(totalLine);
             displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
 
-            updateProductQuantity(session);
             transaction.commit();
-            scannedProducts.clear();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            logger.error("Error during printing or updating products: {}", e.getMessage(), e);
+            logger.error("Error during printing products: {}", e.getMessage(), e);
         } finally {
             if (session != null) {
                 session.close();
