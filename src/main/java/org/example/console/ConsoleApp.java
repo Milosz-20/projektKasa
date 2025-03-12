@@ -76,6 +76,9 @@ public class ConsoleApp {
                         displayLogger.info("Enter Card expiry year (YY)");
                         String expiryYear = scanner.nextLine();
                         clearConsoleLines(2);
+                        displayLogger.info("Enter Card cvv: (xxx)");
+                        String cvv = scanner.nextLine();
+                        clearConsoleLines(2);
 
                         try {
                             int year = Integer.parseInt(expiryYear);
@@ -88,7 +91,7 @@ public class ConsoleApp {
                                 throw new IllegalArgumentException("Nieprawidłowy miesiąc. Proszę wprowadzić wartość od 1 do 12.");
                             }
                             displayLogger.info("Płatność przetwarzana dla kwoty: {} zł", String.format("%.2f", totalAmount));
-                            processCardPayment(cardNumber, month, year, totalAmount);
+                            processCardPayment(cardNumber, month, year, cvv, totalAmount);
                         } catch (NumberFormatException e) {
                             displayLogger.info("Nieprawidłowe dane: Wprowadź liczby dla miesiąca i roku.");
                         } catch (DateTimeParseException e) {
@@ -134,7 +137,7 @@ public class ConsoleApp {
         return total;
     }
 
-    private void processCardPayment(String cardNumber, int month, int year, double amount) {
+    private void processCardPayment(String cardNumber, int month, int year, String cvv, double amount) {
         try {
             URL url = new URL("http://localhost:8080/api/platnosc");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -146,6 +149,7 @@ public class ConsoleApp {
             paymentData.put("cardNumber", cardNumber);
             paymentData.put("expiryMonth", month);
             paymentData.put("expiryYear", year);
+            paymentData.put("cvv", cvv);
             paymentData.put("amount", amount);
 
             ObjectMapper mapper = new ObjectMapper();
@@ -300,20 +304,41 @@ public class ConsoleApp {
     private boolean canAddProduct(Session session, Product product) {
         int scannedQuantity = scannedProducts.getOrDefault(product, 0);
 
+        if (product.getAvailable_quantity() <= 0 || product.getAvailable_quantity() <= scannedQuantity) {
+            return false;
+        }
+
         for (Map.Entry<Product, Integer> entry : scannedProducts.entrySet()) {
             Product p = session.get(Product.class, entry.getKey().getId());
-            if (p.getId().equals(product.getId())) {
-                if (p.getAvailable_quantity() < scannedQuantity + 1) {
-                    return false;
-                }
-            } else {
-                if (p.getAvailable_quantity() < entry.getValue()) {
-                    return false;
-                }
+            if (!p.getId().equals(product.getId()) && p.getAvailable_quantity() < entry.getValue()) {
+                return false;
             }
         }
         return true;
     }
+
+
+//    private boolean canAddProduct(Session session, Product product) {
+//        int scannedQuantity = scannedProducts.getOrDefault(product, 0);
+//        displayLogger.info(" {}", scannedQuantity);
+//
+//        for (Map.Entry<Product, Integer> entry : scannedProducts.entrySet()) {
+//            Product p = session.get(Product.class, entry.getKey().getId());
+//            if (p.getId().equals(product.getId())) {
+//                if (p.getAvailable_quantity() <= scannedQuantity ) {
+//                    displayLogger.info("1", scannedQuantity, p.getAvailable_quantity());
+//                    return false;
+//                } else {
+//                    displayLogger.info("nie", scannedQuantity, p.getAvailable_quantity());
+//                }
+//            } else {
+//                if (p.getAvailable_quantity() < entry.getValue()) {
+//                    return false;
+//                }
+//            }
+//        }
+//        return true;
+//    }
 
     private void updateProductQuantity(Session session) {
         scannedProducts.forEach((product, quantity) -> {
@@ -370,10 +395,11 @@ public class ConsoleApp {
 
                     String line = formatReceiptLine(productName, "", rightAlignText(price + " " + quantityStr + " " + total), RECEIPT_WIDTH);
                     displayLogger.info(line);
-                } else {
-                    displayLogger.info("Insufficient quantity for product: {}. Available: {}, Requested: {}",
-                            currentProduct.getName(), currentProduct.getAvailable_quantity(), quantity);
                 }
+//                else {
+//                    displayLogger.info("Insufficient quantity for product: {}. Available: {}, Requested: {}",
+//                            currentProduct.getName(), currentProduct.getAvailable_quantity(), quantity);
+//                }
             }
 
             displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
