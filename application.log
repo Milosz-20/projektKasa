@@ -3994,3 +3994,199 @@ java.net.ConnectException: Connection refused: connect
 	at org.example.console.ConsoleApp.processBlikPayment(ConsoleApp.java:230)
 	at org.example.console.ConsoleApp.run(ConsoleApp.java:109)
 	at org.example.Main.main(Main.java:8)
+18:09:20.142 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.4.Final
+18:09:20.667 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+18:09:20.767 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+18:09:23.240 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+18:09:23.341 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require]
+	Database driver: org.postgresql.Driver
+	Database version: 17.4
+	Autocommit mode: false
+	Isolation level: undefined/unknown
+	Minimum pool size: 1
+	Maximum pool size: 20
+18:09:24.333 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+18:09:24.350 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@bb8ead8] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+18:09:24.563 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+18:09:24.565 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+18:09:24.827 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+18:09:24.908 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require]
+	Database driver: org.postgresql.Driver
+	Database version: 17.4
+	Autocommit mode: false
+	Isolation level: undefined/unknown
+	Minimum pool size: 1
+	Maximum pool size: 20
+18:09:24.945 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+18:09:24.946 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@2296127] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+18:09:25.097 [main] INFO  org.example.console.ConsoleApp - Application started.
+18:10:28.790 [main] INFO  org.example.console.ConsoleApp - Product scanned: Laptop HP Pavilion 15
+18:10:30.923 [main] INFO  org.example.console.ConsoleApp - Product scanned: Laptop HP Pavilion 15
+18:10:33.235 [main] INFO  org.example.console.ConsoleApp - Product scanned: Laptop HP Pavilion 15
+18:10:48.649 [main] INFO  org.example.console.ConsoleApp - Updated product: Laptop HP Pavilion 15 to quantity: 8
+18:13:45.149 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.4.Final
+18:13:45.461 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+18:13:45.574 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+18:13:46.303 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+18:13:46.396 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require]
+	Database driver: org.postgresql.Driver
+	Database version: 17.4
+	Autocommit mode: false
+	Isolation level: undefined/unknown
+	Minimum pool size: 1
+	Maximum pool size: 20
+18:13:47.624 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+18:13:47.650 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@bb8ead8] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+18:13:47.764 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+18:13:47.770 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+18:13:48.131 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+18:13:48.221 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require]
+	Database driver: org.postgresql.Driver
+	Database version: 17.4
+	Autocommit mode: false
+	Isolation level: undefined/unknown
+	Minimum pool size: 1
+	Maximum pool size: 20
+18:13:48.261 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+18:13:48.261 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@2296127] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+18:13:48.461 [main] INFO  org.example.console.ConsoleApp - Application started.
+18:14:00.801 [main] INFO  org.example.console.ConsoleApp - Product scanned: Smartwatch Garmin Forerunner 945
+18:14:02.511 [main] INFO  org.example.console.ConsoleApp - Product scanned: Smartwatch Garmin Forerunner 945
+18:14:15.359 [main] INFO  org.example.console.ConsoleApp - Updated product: Smartwatch Garmin Forerunner 945 to quantity: 7
+18:15:26.762 [main] INFO  org.example.console.ConsoleApp - Product scanned: Drukarka HP LaserJet Pro
+18:15:28.166 [main] INFO  org.example.console.ConsoleApp - Product scanned: Drukarka HP LaserJet Pro
+18:15:36.560 [main] INFO  org.example.console.ConsoleApp - Updated product: Drukarka HP LaserJet Pro to quantity: 2
+18:16:57.496 [main] INFO  org.example.console.ConsoleApp - Product scanned: Router Wi-Fi TP-Link Archer AX6000
+18:16:58.364 [main] INFO  org.example.console.ConsoleApp - Product scanned: Router Wi-Fi TP-Link Archer AX6000
+18:16:59.585 [main] INFO  org.example.console.ConsoleApp - Product scanned: Router Wi-Fi TP-Link Archer AX6000
+18:17:00.430 [main] INFO  org.example.console.ConsoleApp - Product scanned: Router Wi-Fi TP-Link Archer AX6000
+18:17:17.446 [main] INFO  org.example.console.ConsoleApp - Updated product: Router Wi-Fi TP-Link Archer AX6000 to quantity: 4
+18:18:52.303 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.4.Final
+18:18:52.555 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+18:18:52.653 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+18:18:53.286 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+18:18:53.379 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require]
+	Database driver: org.postgresql.Driver
+	Database version: 17.4
+	Autocommit mode: false
+	Isolation level: undefined/unknown
+	Minimum pool size: 1
+	Maximum pool size: 20
+18:18:54.428 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+18:18:54.448 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@2e45a357] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+18:18:54.584 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+18:18:54.585 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+18:18:54.850 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+18:18:54.927 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require]
+	Database driver: org.postgresql.Driver
+	Database version: 17.4
+	Autocommit mode: false
+	Isolation level: undefined/unknown
+	Minimum pool size: 1
+	Maximum pool size: 20
+18:18:54.966 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+18:18:54.966 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@4cb24e2] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+18:18:55.182 [main] INFO  org.example.console.ConsoleApp - Application started.
+18:19:00.587 [main] INFO  org.example.console.ConsoleApp - Product scanned: Router Wi-Fi TP-Link Archer AX6000
+18:19:02.302 [main] INFO  org.example.console.ConsoleApp - Product scanned: Router Wi-Fi TP-Link Archer AX6000
+18:19:03.240 [main] INFO  org.example.console.ConsoleApp - Product scanned: Router Wi-Fi TP-Link Archer AX6000
+18:19:03.988 [main] INFO  org.example.console.ConsoleApp - Product scanned: Router Wi-Fi TP-Link Archer AX6000
+18:19:06.341 [main] INFO  org.example.console.ConsoleApp - Product scanned: Router Wi-Fi TP-Link Archer AX6000
+18:19:26.355 [main] INFO  org.example.console.ConsoleApp - Updated product: Router Wi-Fi TP-Link Archer AX6000 to quantity: 0
+18:23:40.299 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.4.Final
+18:23:40.560 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+18:23:40.668 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+18:23:41.359 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+18:23:41.452 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require]
+	Database driver: org.postgresql.Driver
+	Database version: 17.4
+	Autocommit mode: false
+	Isolation level: undefined/unknown
+	Minimum pool size: 1
+	Maximum pool size: 20
+18:23:42.594 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+18:23:42.610 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@41a16eb3] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+18:23:42.728 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+18:23:42.730 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+18:23:43.035 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+18:23:43.124 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require]
+	Database driver: org.postgresql.Driver
+	Database version: 17.4
+	Autocommit mode: false
+	Isolation level: undefined/unknown
+	Minimum pool size: 1
+	Maximum pool size: 20
+18:23:43.163 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+18:23:43.163 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@7cb29ea8] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+18:23:43.332 [main] INFO  org.example.console.ConsoleApp - Application started.
+18:23:48.214 [main] INFO  org.example.console.ConsoleApp - Product scanned: Konsola PlayStation 5
+18:23:49.484 [main] INFO  org.example.console.ConsoleApp - Product scanned: Konsola PlayStation 5
+18:23:50.321 [main] INFO  org.example.console.ConsoleApp - Product scanned: Konsola PlayStation 5
+18:24:05.211 [main] INFO  org.example.console.ConsoleApp - Updated product: Konsola PlayStation 5 to quantity: 12
+18:30:33.369 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.4.Final
+18:30:33.637 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+18:30:33.754 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+18:30:34.394 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+18:30:34.489 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require]
+	Database driver: org.postgresql.Driver
+	Database version: 17.4
+	Autocommit mode: false
+	Isolation level: undefined/unknown
+	Minimum pool size: 1
+	Maximum pool size: 20
+18:30:35.588 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+18:30:35.605 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@bb8ead8] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+18:30:35.786 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+18:30:35.793 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+18:30:36.081 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+18:30:36.164 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require]
+	Database driver: org.postgresql.Driver
+	Database version: 17.4
+	Autocommit mode: false
+	Isolation level: undefined/unknown
+	Minimum pool size: 1
+	Maximum pool size: 20
+18:30:36.203 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+18:30:36.203 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@2296127] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+18:30:36.365 [main] INFO  org.example.console.ConsoleApp - Application started.
+18:30:38.387 [main] INFO  org.example.console.ConsoleApp - Product scanned: Smartfon Samsung Galaxy S23
+18:30:39.930 [main] INFO  org.example.console.ConsoleApp - Product scanned: Smartfon Samsung Galaxy S23
+18:30:49.579 [main] INFO  org.example.console.ConsoleApp - Updated product: Smartfon Samsung Galaxy S23 to quantity: 13
+18:31:20.049 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.4.Final
+18:31:20.319 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+18:31:20.427 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+18:31:21.129 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+18:31:21.217 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require]
+	Database driver: org.postgresql.Driver
+	Database version: 17.4
+	Autocommit mode: false
+	Isolation level: undefined/unknown
+	Minimum pool size: 1
+	Maximum pool size: 20
+18:31:22.351 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+18:31:22.368 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@677cb96e] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+18:31:22.483 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+18:31:22.485 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+18:31:22.761 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+18:31:22.839 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-restless-flower-a993np7l-pooler.gwc.azure.neon.tech/shop?sslmode=require]
+	Database driver: org.postgresql.Driver
+	Database version: 17.4
+	Autocommit mode: false
+	Isolation level: undefined/unknown
+	Minimum pool size: 1
+	Maximum pool size: 20
+18:31:22.892 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+18:31:22.893 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@b5c902] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+18:31:23.038 [main] INFO  org.example.console.ConsoleApp - Application started.
