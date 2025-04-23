@@ -60,7 +60,8 @@ public class ConsoleApp {
                 displayLogger.info("Select payment method");
                 displayNiceLine();
                 displayLogger.info("  Type '1' to pay by card");
-                displayLogger.info("  Type '2' to pay by scanning gift card");
+                displayLogger.info("  Type '2' to pay with Blik");
+                displayLogger.info("  Type '3' to pay by scanning a gift card");
                 displayNiceLine();
                 String paymentMethod = scanner.nextLine();
 
@@ -99,12 +100,19 @@ public class ConsoleApp {
                         } catch (IllegalArgumentException e) {
                             displayLogger.info(e.getMessage());
                         }
-
                         break;
+
                     case "2":
-                        displayLogger.info("Gift card");
-
+                        clearConsoleLines(8);
+                        displayLogger.info("Enter Blik code");
+                        String blikCode = scanner.nextLine();
+                        processBlikPayment(blikCode, totalAmount);
                         break;
+
+                    case "3":
+                        displayLogger.info("Gift card");
+                        break;
+
                     default:
                         displayLogger.info("Unknown payment method");
                         break;
@@ -154,6 +162,70 @@ public class ConsoleApp {
 
             ObjectMapper mapper = new ObjectMapper();
             String jsonData = mapper.writeValueAsString(paymentData);
+
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonData.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = connection.getResponseCode();
+            displayLogger.info("Wysłano dane płatności do serwera, kod odpowiedzi: {}", responseCode);
+
+            if (responseCode >= 200 && responseCode < 300) {
+                try (Session updateSession = sessionFactory.openSession()) {
+                    Transaction updateTransaction = updateSession.beginTransaction();
+                    updateProductQuantity(updateSession);
+                    updateTransaction.commit();
+                    scannedProducts.clear();
+                }
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    // Parsowanie odpowiedzi JSON i wyświetlanie tylko pola "message"
+                    try {
+                        Map responseMap = mapper.readValue(response.toString(), Map.class);
+                        if (responseMap.containsKey("message")) {
+                            displayLogger.info("Odpowiedź serwera: {}", responseMap.get("message"));
+                        } else {
+                            displayLogger.info("Odpowiedź serwera: {}", response);
+                        }
+                    } catch (Exception e) {
+                        displayLogger.info("Odpowiedź serwera: {}", response);
+                        logger.error("Błąd parsowania odpowiedzi JSON: {}", e.getMessage());
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("Błąd podczas wysyłania danych płatności: {}", e.getMessage(), e);
+            displayLogger.info("Wystąpił błąd podczas przetwarzania płatności. Spróbuj ponownie.");
+        }
+    }
+
+    private void processBlikPayment(String blikCode, double amount) {
+        try {
+            URL url = new URL("http://localhost:8080/api/platnosc/blik");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            Map<String, Object> paymentData = new HashMap<>();
+            paymentData.put("blikCode", blikCode);
+            paymentData.put("amount", amount);
+
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonData = mapper.writeValueAsString(paymentData);
+
+            // ---> TUTAJ DODAJ LOGOWANIE/WYDRUK <---
+            System.out.println("--- Dane do wysłania (Blik) ---");
+            System.out.println(jsonData);
+            logger.debug("Attempting to send Blik payment data: {}", jsonData); // Lub użyj loggera
+            // ----------------------------------------
 
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = jsonData.getBytes(StandardCharsets.UTF_8);
