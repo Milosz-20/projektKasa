@@ -1,14 +1,12 @@
 package org.example.console;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -44,8 +42,8 @@ public class ConsoleApp {
         displayLogger.info("Welcome to the Product Scanner App!");
         displayNiceLine();
         displayLogger.info("Instructions:");
-        displayLogger.info("* Scan barcodes to add products to your order.");
-        displayLogger.info("* Type '"+ PAY_COMMAND +"' to view the current order.");
+        displayLogger.info("* Scan product barcodes to add items to your shopping cart.");
+        displayLogger.info("* Type '"+ PAY_COMMAND +"' to view your cart and proceed to checkout.");
         displayLogger.info("* Type '"+ EXIT_COMMAND +"' to close the application.");
         displayNiceLine();
         logger.info("Application started.");
@@ -56,47 +54,50 @@ public class ConsoleApp {
             if (barcodeInput.equals(EXIT_COMMAND)) {
                 break;
             } else if (barcodeInput.equals(PAY_COMMAND)) {
+                clearConsole();
+                printScannedProducts();
+                addLineBreak(2);
                 double totalAmount = calculateTotalAmount();
-                displayLogger.info("Select payment method");
+                displayLogger.info("Please select your payment method:");
                 displayNiceLine();
-                displayLogger.info("  Type '1' to pay by card");
-                displayLogger.info("  Type '2' to pay with Blik");
-                displayLogger.info("  Type '3' to pay by scanning a gift card");
+                displayLogger.info("  Type '1' for Credit/Debit Card payment");
+                displayLogger.info("  Type '2' for BLIK mobile payment");
+                displayLogger.info("  Type '3' for Gift Card payment");
                 displayNiceLine();
                 String paymentMethod = scanner.nextLine();
 
                 switch (paymentMethod) {
                     case "1":
                         clearConsoleLines(8);
-                        displayLogger.info("Enter Card number");
+                        displayLogger.info("Please enter your card number:");
                         String cardNumber = scanner.nextLine();
                         clearConsoleLines(2);
-                        displayLogger.info("Enter Card expiry month");
+                        displayLogger.info("Please enter the expiration month (1-12):");
                         String expiryMonth = scanner.nextLine();
                         clearConsoleLines(2);
-                        displayLogger.info("Enter Card expiry year (YY)");
+                        displayLogger.info("Please enter the expiration year (YY):");
                         String expiryYear = scanner.nextLine();
                         clearConsoleLines(2);
-                        displayLogger.info("Enter Card cvv: (xxx)");
+                        displayLogger.info("Please enter the CVV security code (3 digits):");
                         String cvv = scanner.nextLine();
                         clearConsoleLines(2);
 
                         try {
                             int year = Integer.parseInt(expiryYear);
                             if (year < 0 || year > 99) {
-                                throw new IllegalArgumentException("Nieprawidłowy format roku. Proszę wprowadzić dwucyfrowy rok (YY).");
+                                throw new IllegalArgumentException("Invalid year format. Type 'pay' to try payment again.");
                             }
                             year = 2000 + year;
                             int month = Integer.parseInt(expiryMonth);
                             if(month < 1 || month > 12){
-                                throw new IllegalArgumentException("Nieprawidłowy miesiąc. Proszę wprowadzić wartość od 1 do 12.");
+                                throw new IllegalArgumentException("Invalid month. Month must be between 1 and 12. Type 'pay' to try payment again.");
                             }
-                            displayLogger.info("Płatność przetwarzana dla kwoty: {} zł", String.format("%.2f", totalAmount));
+                            displayLogger.info("Processing payment for amount: {} PLN", String.format("%.2f", totalAmount));
                             processCardPayment(cardNumber, month, year, cvv, totalAmount);
                         } catch (NumberFormatException e) {
-                            displayLogger.info("Nieprawidłowe dane: Wprowadź liczby dla miesiąca i roku.");
+                            displayLogger.info("Invalid data format. Please enter numeric values only. Type 'pay' to try payment again.");
                         } catch (DateTimeParseException e) {
-                            displayLogger.info("Nieprawidłowy format daty: {}", e.getMessage());
+                            displayLogger.info("Invalid date format: {}. Type 'pay' to try payment again.", e.getMessage());
                         } catch (IllegalArgumentException e) {
                             displayLogger.info(e.getMessage());
                         }
@@ -104,17 +105,18 @@ public class ConsoleApp {
 
                     case "2":
                         clearConsoleLines(8);
-                        displayLogger.info("Enter Blik code");
+                        displayLogger.info("Please enter your 6-digit BLIK code:");
                         String blikCode = scanner.nextLine();
+                        displayLogger.info("Processing BLIK payment for amount: {} PLN", String.format("%.2f", totalAmount));
                         processBlikPayment(blikCode, totalAmount);
                         break;
 
                     case "3":
-                        displayLogger.info("Gift card");
+                        displayLogger.info("Please scan your gift card or enter the gift card code:");
                         break;
 
                     default:
-                        displayLogger.info("Unknown payment method");
+                        displayLogger.info("Invalid selection. Please type 1, 2, or 3 to select a payment method.");
                         break;
                 }
 
@@ -127,19 +129,22 @@ public class ConsoleApp {
         sessionFactory.close();
     }
 
+    private void addLineBreak(int i) {
+        for (int j = 0; j < i; j++) {
+            System.out.println();
+        }
+    }
+
     private double calculateTotalAmount() {
         double total = 0.0;
-        Session session = sessionFactory.openSession();
 
-        try {
+        try (Session session = sessionFactory.openSession()) {
             for (Map.Entry<Product, Integer> entry : scannedProducts.entrySet()) {
                 Product product = session.get(Product.class, entry.getKey().getId());
                 if (product != null) {
                     total += product.getPrice() * entry.getValue();
                 }
             }
-        } finally {
-            session.close();
         }
 
         return total;
@@ -169,40 +174,12 @@ public class ConsoleApp {
             }
 
             int responseCode = connection.getResponseCode();
-            displayLogger.info("Wysłano dane płatności do serwera, kod odpowiedzi: {}", responseCode);
 
-            if (responseCode >= 200 && responseCode < 300) {
-                try (Session updateSession = sessionFactory.openSession()) {
-                    Transaction updateTransaction = updateSession.beginTransaction();
-                    updateProductQuantity(updateSession);
-                    updateTransaction.commit();
-                    scannedProducts.clear();
-                }
-                try (BufferedReader br = new BufferedReader(
-                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                    // Parsowanie odpowiedzi JSON i wyświetlanie tylko pola "message"
-                    try {
-                        Map responseMap = mapper.readValue(response.toString(), Map.class);
-                        if (responseMap.containsKey("message")) {
-                            displayLogger.info("Odpowiedź serwera: {}", responseMap.get("message"));
-                        } else {
-                            displayLogger.info("Odpowiedź serwera: {}", response);
-                        }
-                    } catch (Exception e) {
-                        displayLogger.info("Odpowiedź serwera: {}", response);
-                        logger.error("Błąd parsowania odpowiedzi JSON: {}", e.getMessage());
-                    }
-                }
-            }
+            handleSuccessfulResponse(connection, mapper, responseCode);
 
         } catch (Exception e) {
-            logger.error("Błąd podczas wysyłania danych płatności: {}", e.getMessage(), e);
-            displayLogger.info("Wystąpił błąd podczas przetwarzania płatności. Spróbuj ponownie.");
+            logger.error("Error sending payment data: {}", e.getMessage(), e);
+            displayLogger.info("An error occurred while processing your card payment. Please try again.");
         }
     }
 
@@ -221,11 +198,7 @@ public class ConsoleApp {
             ObjectMapper mapper = new ObjectMapper();
             String jsonData = mapper.writeValueAsString(paymentData);
 
-            // ---> TUTAJ DODAJ LOGOWANIE/WYDRUK <---
-            System.out.println("--- Dane do wysłania (Blik) ---");
-            System.out.println(jsonData);
-            logger.debug("Attempting to send Blik payment data: {}", jsonData); // Lub użyj loggera
-            // ----------------------------------------
+            logger.debug("Attempting to send BLIK payment data: {}", jsonData);
 
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = jsonData.getBytes(StandardCharsets.UTF_8);
@@ -233,40 +206,72 @@ public class ConsoleApp {
             }
 
             int responseCode = connection.getResponseCode();
-            displayLogger.info("Wysłano dane płatności do serwera, kod odpowiedzi: {}", responseCode);
 
-            if (responseCode >= 200 && responseCode < 300) {
-                try (Session updateSession = sessionFactory.openSession()) {
-                    Transaction updateTransaction = updateSession.beginTransaction();
-                    updateProductQuantity(updateSession);
-                    updateTransaction.commit();
-                    scannedProducts.clear();
-                }
-                try (BufferedReader br = new BufferedReader(
-                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                    // Parsowanie odpowiedzi JSON i wyświetlanie tylko pola "message"
-                    try {
-                        Map responseMap = mapper.readValue(response.toString(), Map.class);
-                        if (responseMap.containsKey("message")) {
-                            displayLogger.info("Odpowiedź serwera: {}", responseMap.get("message"));
-                        } else {
-                            displayLogger.info("Odpowiedź serwera: {}", response);
-                        }
-                    } catch (Exception e) {
-                        displayLogger.info("Odpowiedź serwera: {}", response);
-                        logger.error("Błąd parsowania odpowiedzi JSON: {}", e.getMessage());
-                    }
-                }
-            }
+            handleSuccessfulResponse(connection, mapper, responseCode);
 
         } catch (Exception e) {
-            logger.error("Błąd podczas wysyłania danych płatności: {}", e.getMessage(), e);
-            displayLogger.info("Wystąpił błąd podczas przetwarzania płatności. Spróbuj ponownie.");
+            logger.error("Error sending BLIK payment data: {}", e.getMessage(), e);
+            displayLogger.info("An error occurred while processing your BLIK payment. Please try again.");
+        }
+    }
+
+    private void handleSuccessfulResponse(HttpURLConnection connection, ObjectMapper mapper, int responseCode) throws IOException {
+        if (responseCode >= 200 && responseCode < 300) {
+            try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                try {
+                    Map responseMap = mapper.readValue(response.toString(), Map.class);
+                    boolean isPaymentSuccessful = !responseMap.containsKey("status") || responseMap.get("status").equals("success");
+
+                    if (isPaymentSuccessful) {
+                        try (Session updateSession = sessionFactory.openSession()) {
+                            Transaction updateTransaction = updateSession.beginTransaction();
+                            updateProductQuantity(updateSession);
+                            updateTransaction.commit();
+                            scannedProducts.clear();
+                        }
+
+                        if (responseMap.containsKey("message")) {
+                            clearConsoleLines(3);
+                            displayLogger.info("Payment successful: {}", responseMap.get("message"));
+                            addLineBreak(1);
+                            displayLogger.info("To start a new purchase, scan another product.");
+                        } else {
+                            clearConsoleLines(3);
+                            displayLogger.info("Payment successful: {}", response);
+                            addLineBreak(1);
+                            displayLogger.info("To start a new purchase, scan another product.");
+                        }
+                    } else {
+                        if (responseMap.containsKey("message") ) {
+                            clearConsoleLines(3);
+                            displayLogger.info("Payment failed: {}", responseMap.get("message"));
+                            addLineBreak(1);
+                            displayLogger.info("To try payment again, type 'pay'.");
+                        } else {
+                            clearConsoleLines(3);
+                            displayLogger.info("Payment failed: {}", response);
+                            addLineBreak(1);
+                            displayLogger.info("To try payment again, type 'pay'.");
+                        }
+                    }
+
+
+
+
+                } catch (Exception e) {
+                    clearConsoleLines(2);
+                    displayLogger.info("Server response: {}", response);
+                    addLineBreak(2);
+                    displayLogger.info("To try payment again, type 'pay'.");
+                    logger.error("Error parsing JSON response: {}", e.getMessage());
+                }
+            }
         }
     }
 
@@ -282,7 +287,7 @@ public class ConsoleApp {
                 logger.error("Hibernate error occurred: {}", e.getMessage(), e);
             }
         } else {
-            displayLogger.info("Input is not a barcode!");
+            displayLogger.info("Invalid input! Please scan a valid product barcode.");
         }
     }
 
@@ -309,7 +314,7 @@ public class ConsoleApp {
                     .setParameter("barcode", barcodeInput)
                     .getSingleResult();
         } catch (NoResultException e) {
-            displayLogger.info("Product with barcode: " + barcodeInput + " does not exist.");
+            displayLogger.info("Product not found. Barcode " + barcodeInput + " is not in our database.");
             return null;
         }
     }
@@ -318,7 +323,7 @@ public class ConsoleApp {
         clearConsole();
         Product currentProduct = session.get(Product.class, product.getId());
         if (currentProduct == null) {
-            displayLogger.info("Product with ID: " + product.getId() + " does not exist.");
+            displayLogger.info("Product with ID: " + product.getId() + " is no longer available in our system.");
             return;
         }
 
@@ -326,9 +331,12 @@ public class ConsoleApp {
         if (canAddProduct(session, currentProduct)) {
             scannedProducts.put(currentProduct, scannedProducts.getOrDefault(currentProduct, 0) + 1);
             printScannedProducts();
-            displayLogger.info("Type 'pay' to complete the order.");
+            addLineBreak(1);
+            displayLogger.info("Product added to cart. Type 'pay' to proceed to checkout.");
         } else {
-            displayLogger.info("Product: {} is currently out of stock (or insufficient quantity). Cannot add to order.", currentProduct.getName());
+            printScannedProducts();
+            addLineBreak(1);
+            displayLogger.info("Sorry, product '{}' is out of stock or has insufficient quantity available. Cannot add to your cart.", currentProduct.getName());
         }
     }
 
@@ -355,13 +363,13 @@ public class ConsoleApp {
             final String os = System.getProperty("os.name");
             if (os.contains("Windows")) {
                 for (int i = 0; i < lines; i++) {
-                    System.out.print("\033[1A"); // Move cursor up one line
-                    System.out.print("\033[2K"); // Clear the line
+                    System.out.print("\033[1A");
+                    System.out.print("\033[2K");
                 }
             } else {
                 for (int i = 0; i < lines; i++) {
-                    System.out.print("\033[1A"); // Move cursor up one line
-                    System.out.print("\033[2K"); // Clear the line
+                    System.out.print("\033[1A");
+                    System.out.print("\033[2K");
                 }
             }
             System.out.flush();
@@ -388,38 +396,16 @@ public class ConsoleApp {
         }
         return true;
     }
-
-
-//    private boolean canAddProduct(Session session, Product product) {
-//        int scannedQuantity = scannedProducts.getOrDefault(product, 0);
-//        displayLogger.info(" {}", scannedQuantity);
-//
-//        for (Map.Entry<Product, Integer> entry : scannedProducts.entrySet()) {
-//            Product p = session.get(Product.class, entry.getKey().getId());
-//            if (p.getId().equals(product.getId())) {
-//                if (p.getAvailable_quantity() <= scannedQuantity ) {
-//                    displayLogger.info("1", scannedQuantity, p.getAvailable_quantity());
-//                    return false;
-//                } else {
-//                    displayLogger.info("nie", scannedQuantity, p.getAvailable_quantity());
-//                }
-//            } else {
-//                if (p.getAvailable_quantity() < entry.getValue()) {
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
-//    }
+    
 
     private void updateProductQuantity(Session session) {
         scannedProducts.forEach((product, quantity) -> {
             if (product.getAvailable_quantity() >= quantity) {
                 product.setAvailable_quantity(product.getAvailable_quantity() - quantity);
                 session.merge(product);
-                logger.info("Updated product: {} to quantity: {}", product.getName(), product.getAvailable_quantity());
+                logger.info("Updated inventory: {} - new quantity: {}", product.getName(), product.getAvailable_quantity());
             } else {
-                displayLogger.info("Product: {} is out of stock. Cannot add to order.", product.getName());
+                displayLogger.info("Inventory update failed: '{}' is out of stock. Please contact store staff for assistance.", product.getName());
             }
         });
     }
@@ -432,17 +418,14 @@ public class ConsoleApp {
     }
 
     public void printScannedProducts() {
-        Session session = null;
-        Transaction transaction = null;
 
-        try {
-            session = sessionFactory.openSession();
+        Transaction transaction = null;
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
 
-            final int RECEIPT_WIDTH = 60;
-            displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
-            displayLogger.info(centerText("----- Scanned Products -----", RECEIPT_WIDTH));
-            displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
+            displayLogger.info(repeatChar("-"));
+            displayLogger.info(centerText());
+            displayLogger.info(repeatChar("-"));
 
             AtomicReference<Double> totalAmount = new AtomicReference<>(0.0);
 
@@ -461,24 +444,20 @@ public class ConsoleApp {
                     totalAmount.updateAndGet(v -> v + totalPrice);
 
                     String productName = currentProduct.getName();
-                    String price = String.format("%.2f zl", currentProduct.getPrice());
+                    String price = String.format("%.2f PLN", currentProduct.getPrice());
                     String quantityStr = "x" + quantity;
-                    String total = String.format("%.2f zl", totalPrice);
+                    String total = String.format("%.2f PLN", totalPrice);
 
-                    String line = formatReceiptLine(productName, "", rightAlignText(price + " " + quantityStr + " " + total), RECEIPT_WIDTH);
+                    String line = formatReceiptLine(productName, rightAlignText(price + " " + quantityStr + " = " + total));
                     displayLogger.info(line);
                 }
-//                else {
-//                    displayLogger.info("Insufficient quantity for product: {}. Available: {}, Requested: {}",
-//                            currentProduct.getName(), currentProduct.getAvailable_quantity(), quantity);
-//                }
             }
 
-            displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
+            displayLogger.info(repeatChar("-"));
 
-            String totalLine = formatReceiptLine("TOTAL:", "", rightAlignText(String.format("%.2f zl", totalAmount.get())), RECEIPT_WIDTH);
+            String totalLine = formatReceiptLine("TOTAL AMOUNT:", rightAlignText(String.format("%.2f PLN", totalAmount.get())));
             displayLogger.info(totalLine);
-            displayLogger.info(repeatChar("-", RECEIPT_WIDTH));
+            displayLogger.info(repeatChar("="));
 
             transaction.commit();
         } catch (Exception e) {
@@ -486,31 +465,24 @@ public class ConsoleApp {
                 transaction.rollback();
             }
             logger.error("Error during printing products: {}", e.getMessage(), e);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
     }
 
-    private String centerText(String text, int width) {
-        int padding = (width - text.length() - 2) / 2;
-        return "|" + padSides(" ", padding) + text + padSides(" ", width - text.length() - padding - 2) + "|";
+    private String centerText() {
+        int padding = (60 - "===== YOUR SHOPPING CART =====".length() - 2) / 2;
+        return "|" + padSides(" ", padding) + "===== YOUR SHOPPING CART =====" + padSides(" ", 60 - "===== YOUR SHOPPING CART =====".length() - padding - 2) + "|";
     }
 
-    private String formatReceiptLine(String left, String middle, String right, int width) {
-        int availableWidth = width - 2;
+    private String formatReceiptLine(String left, String right) {
+        int availableWidth = 60 - 2;
         String leftPart = left;
-        String middlePart = middle;
+        String middlePart = "";
 
         int maxMiddlePartWidth = 10;
         int maxLeftPartWidth = availableWidth - maxMiddlePartWidth - right.length();
 
         if (leftPart.length() > maxLeftPartWidth) {
             leftPart = leftPart.substring(0, maxLeftPartWidth - 1) + ".";
-        }
-        if (middlePart.length() > maxMiddlePartWidth) {
-            middlePart = middlePart.substring(0, maxMiddlePartWidth - 1) + ".";
         }
 
         String leftPadded = padSides(leftPart, maxLeftPartWidth);
@@ -520,25 +492,17 @@ public class ConsoleApp {
     }
 
     private String rightAlignText(String text) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 10 - text.length(); i++) {
-            sb.append(" ");
-        }
-        sb.append(text);
-        return sb.toString();
+        return " ".repeat(Math.max(0, 10 - text.length())) +
+                text;
     }
 
     private String padSides(String text, int totalWidth) {
         int padding = Math.max(0, totalWidth - text.length());
-        StringBuilder sb = new StringBuilder();
-        sb.append(text);
-        for (int i = 0; i < padding; i++) {
-            sb.append(" ");
-        }
-        return sb.toString();
+        return text +
+                " ".repeat(padding);
     }
 
-    private String repeatChar(String character, int count) {
-        return "|" + character.repeat(count - 2) + "|";
+    private String repeatChar(String character) {
+        return "|" + character.repeat(60 - 2) + "|";
     }
 }
