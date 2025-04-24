@@ -107,8 +107,13 @@ public class ConsoleApp {
                         clearConsoleLines(8);
                         displayLogger.info("Please enter your 6-digit BLIK code:");
                         String blikCode = scanner.nextLine();
-                        displayLogger.info("Processing BLIK payment for amount: {} PLN", String.format("%.2f", totalAmount));
-                        processBlikPayment(blikCode, totalAmount);
+                        try {
+                            Integer.parseInt(blikCode);
+                            displayLogger.info("Processing BLIK payment for amount: {} PLN", String.format("%.2f", totalAmount));
+                            processBlikPayment(blikCode, totalAmount);
+                        } catch (NumberFormatException e) {
+                            displayLogger.info("Invalid BLIK code. Please enter numbers only. Type 'pay' to try payment again.");
+                        }
                         break;
 
                     case "3":
@@ -237,24 +242,28 @@ public class ConsoleApp {
                         }
 
                         if (responseMap.containsKey("message")) {
-                            clearConsoleLines(3);
+                            clearConsoleLines(2);
                             displayLogger.info("Payment successful: {}", responseMap.get("message"));
                             addLineBreak(1);
                             displayLogger.info("To start a new purchase, scan another product.");
                         } else {
-                            clearConsoleLines(3);
+                            clearConsoleLines(2);
                             displayLogger.info("Payment successful: {}", response);
                             addLineBreak(1);
                             displayLogger.info("To start a new purchase, scan another product.");
                         }
                     } else {
                         if (responseMap.containsKey("message") ) {
-                            clearConsoleLines(3);
+                            clearConsole();
+                            printScannedProducts();
+                            addLineBreak(1);
                             displayLogger.info("Payment failed: {}", responseMap.get("message"));
                             addLineBreak(1);
                             displayLogger.info("To try payment again, type 'pay'.");
                         } else {
-                            clearConsoleLines(3);
+                            clearConsole();
+                            printScannedProducts();
+                            addLineBreak(1);
                             displayLogger.info("Payment failed: {}", response);
                             addLineBreak(1);
                             displayLogger.info("To try payment again, type 'pay'.");
