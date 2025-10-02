@@ -58,6 +58,6 @@ This repository is part of a project to simulate a shop self-checkout system. It
 
 ## Related Repository
 
-For payment processing, see the bank server at https://github.com/Milosz-20/projektKasa
+For payment processing, see the bank server at https://github.com/Milosz-20/projektBank
 
 ---
